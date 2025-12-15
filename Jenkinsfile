@@ -40,6 +40,17 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    python -m venv venv || true
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+
         stage('Run Test Cases') {
             steps {
                     sh '''
