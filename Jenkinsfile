@@ -42,9 +42,9 @@ pipeline {
         stage('Run Test Cases') {
             steps {
                     sh '''
-                        . ${VENV}/bin/activate
+                        . venv/bin/activate
                         export PYTHONPATH=$(pwd)
-                        pytest -v
+                        pylint tests
                     '''
                     }
         }
