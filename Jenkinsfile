@@ -1,58 +1,43 @@
 pipeline {
-agent any
-
-environment {
-    VENV = "venv"
-}
-
-stages {
-
-    stage('Checkout') {
-        steps {
-            echo 'Code checkout completed'
+    agent {
+        docker {
+            image 'python:3.11-slim'
         }
     }
 
-    stage('Setup Python') {
-        steps {
-            sh '''
-                python3 -m venv ${VENV}
-                . ${VENV}/bin/activate
-                pip install --upgrade pip
-                pip install pytest pylint
-                if [ -f requirements.txt ]; then
-                    pip install -r requirements.txt
-                fi
-            '''
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Code checkout completed'
+            }
+        }
+
+        stage('Setup Python') {
+            steps {
+                sh '''
+                    pip install --upgrade pip
+                    pip install pytest pylint
+                    if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+                '''
+            }
+        }
+
+        stage('Pylint Check') {
+            steps {
+                sh 'pylint tests'
+            }
+        }
+
+        stage('Run Test Cases') {
+            steps {
+                sh 'pytest -v'
+            }
         }
     }
 
-    stage('Pylint Check') {
-        steps {
-            sh '''
-                . ${VENV}/bin/activate
-                pylint tests
-            '''
-        }
+    post {
+        success { echo 'All checks passed ✅' }
+        failure { echo 'Pipeline failed ❌' }
     }
-
-    stage('Run Test Cases') {
-        steps {
-            sh '''
-                . ${VENV}/bin/activate
-                pytest -v
-            '''
-        }
-    }
-}
-
-post {
-    success {
-        echo 'All checks passed ✅'
-    }
-    failure {
-        echo 'Pipeline failed ❌'
-    }
-}
-
 }
