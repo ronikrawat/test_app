@@ -1,8 +1,8 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11-slim'
-        }
+    agent any
+
+    environment {
+        VENV = "venv"
     }
 
     stages {
@@ -16,6 +16,13 @@ pipeline {
         stage('Setup Python') {
             steps {
                 sh '''
+                    # Install Python if not present (Ubuntu/Debian)
+                    if ! command -v python3 &> /dev/null; then
+                        apt update && apt install -y python3 python3-venv python3-pip
+                    fi
+
+                    python3 -m venv ${VENV}
+                    . ${VENV}/bin/activate
                     pip install --upgrade pip
                     pip install pytest pylint
                     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -25,13 +32,19 @@ pipeline {
 
         stage('Pylint Check') {
             steps {
-                sh 'pylint tests'
+                sh '''
+                    . ${VENV}/bin/activate
+                    pylint tests
+                '''
             }
         }
 
         stage('Run Test Cases') {
             steps {
-                sh 'pytest -v'
+                sh '''
+                    . ${VENV}/bin/activate
+                    pytest -v
+                '''
             }
         }
     }
