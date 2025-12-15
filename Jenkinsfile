@@ -1,20 +1,17 @@
 pipeline {
-agent any
+    agent any
 
-```
-stages {
-    stage('Checkout') {
-        steps {
-            echo 'Code checked out successfully'
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Code checked out successfully'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'python --version'
+            }
         }
     }
-
-    stage('Run Tests') {
-        steps {
-            sh 'python --version'
-        }
-    }
-}
-```
-
 }
