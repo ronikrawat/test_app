@@ -33,7 +33,8 @@ pipeline {
         stage('Pylint Check') {
             steps {
                 sh '''
-                    . ${VENV}/bin/activate
+                    . venv/bin/activate
+                    export PYTHONPATH=$(pwd)
                     pylint tests
                 '''
             }
@@ -44,7 +45,7 @@ pipeline {
                     sh '''
                         . venv/bin/activate
                         export PYTHONPATH=$(pwd)
-                        pylint tests
+                        pytest tests
                     '''
                     }
         }
