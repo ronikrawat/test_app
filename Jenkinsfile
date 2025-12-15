@@ -41,11 +41,12 @@ pipeline {
 
         stage('Run Test Cases') {
             steps {
-                sh '''
-                    . ${VENV}/bin/activate
-                    pytest -v
-                '''
-            }
+                    sh '''
+                        . ${VENV}/bin/activate
+                        export PYTHONPATH=$(pwd)
+                        pytest -v
+                    '''
+                    }
         }
     }
 
