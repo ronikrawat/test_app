@@ -1,27 +1,28 @@
 pipeline {
 agent any
 
-```
 environment {
-    VENV_DIR = "venv"
+    VENV = "venv"
 }
 
 stages {
 
     stage('Checkout') {
         steps {
-            echo 'Checking out source code'
+            echo 'Code checkout completed'
         }
     }
 
-    stage('Setup Python Environment') {
+    stage('Setup Python') {
         steps {
             sh '''
-                python3 -m venv ${VENV_DIR}
-                . ${VENV_DIR}/bin/activate
+                python3 -m venv ${VENV}
+                . ${VENV}/bin/activate
                 pip install --upgrade pip
                 pip install pytest pylint
-                if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+                if [ -f requirements.txt ]; then
+                    pip install -r requirements.txt
+                fi
             '''
         }
     }
@@ -29,8 +30,8 @@ stages {
     stage('Pylint Check') {
         steps {
             sh '''
-                . ${VENV_DIR}/bin/activate
-                pylint tests || exit 1
+                . ${VENV}/bin/activate
+                pylint tests
             '''
         }
     }
@@ -38,7 +39,7 @@ stages {
     stage('Run Test Cases') {
         steps {
             sh '''
-                . ${VENV_DIR}/bin/activate
+                . ${VENV}/bin/activate
                 pytest -v
             '''
         }
@@ -46,16 +47,12 @@ stages {
 }
 
 post {
-    always {
-        echo 'Pipeline finished'
+    success {
+        echo 'All checks passed ✅'
     }
     failure {
-        echo 'Build failed ❌'
-    }
-    success {
-        echo 'Build successful ✅'
+        echo 'Pipeline failed ❌'
     }
 }
-
 
 }
